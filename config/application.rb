@@ -1,4 +1,4 @@
-require_relative 'boot'
+require_relative "boot"
 
 require "rails"
 # Pick the frameworks you want:
@@ -33,5 +33,20 @@ module Authie
     # Middleware like session, flash, cookies can be added back manually.
     # Skip views, helpers and assets when generating a new resource.
     config.api_only = true
+    config.middleware.use ActionDispatch::Cookies
+    config.middleware.use ActionDispatch::Session::CookieStore, key: "_authie"
+
+    config.middleware.insert_before 0, Rack::Cors, debug: true, logger: (-> { Rails.logger }) do
+      allow do
+        origins /.*/
+        resource(
+          "*",
+          headers: :any,
+          methods: [:get, :post, :delete, :put, :patch, :options, :head],
+          max_age: 86400,
+          credentials: true,
+        )
+      end
+    end
   end
 end
