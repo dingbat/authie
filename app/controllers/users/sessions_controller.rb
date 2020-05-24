@@ -6,11 +6,13 @@ class Users::SessionsController < Devise::SessionsController
 
   # POST /users/sign_in
   def create
-    resource = User.find_for_database_authentication(email: params[:email])
+    auth_params = params.require(:user)
+    user = User.find_for_database_authentication(email: auth_params[:email])
 
-    if resource&.valid_password?(params[:password])
+    if user&.valid_password?(auth_params[:password])
       reset_session
-      sign_in :user, resource
+      warden.authenticate!
+      sign_in :user, user
       render nothing: true
     else
       render json: { error: "Invalid credentials provided." }, status: :unprocessable_entity

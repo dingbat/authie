@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from "react";
+import React, { useState, useCallback, useEffect } from "react";
 import "./App.css";
 
 let csrf = "";
@@ -24,6 +24,9 @@ async function callApi({ path, body, method }) {
 
 function App() {
   const [authenticated, setAuthenticated] = useState(false);
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [rememberMe, setRememberMe] = useState(false);
 
   const handleLogOut = useCallback(async () => {
     try {
@@ -33,7 +36,7 @@ function App() {
       });
       console.log(data);
     } catch {}
-  });
+  }, []);
 
   const handleSession = useCallback(async () => {
     try {
@@ -42,8 +45,19 @@ function App() {
         method: "GET",
       });
       csrf = data.csrf;
-    } catch {}
-  });
+      return true;
+    } catch {
+      return false;
+    }
+  }, []);
+
+  useEffect(() => {
+    const checkLogin = async () => {
+      const loggedIn = await handleSession();
+      setAuthenticated(loggedIn);
+    };
+    checkLogin();
+  }, [handleSession]);
 
   const handleTest = useCallback(async () => {
     try {
@@ -53,20 +67,18 @@ function App() {
       });
       console.log(data);
     } catch {}
-  });
+  }, []);
 
   const handleSubmit = useCallback(async () => {
     try {
       await callApi({
-        body: { email, password },
+        body: { user: { email, password, remember_me: rememberMe } },
         path: "/users/sign_in",
         method: "POST",
       });
       setAuthenticated(true);
     } catch {}
-  });
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
+  }, [email, password, rememberMe]);
 
   return (
     <div className="App">
@@ -91,6 +103,14 @@ function App() {
               placeholder="password"
               type="password"
             />
+          </div>
+          <div>
+            <input
+              type="checkbox"
+              checked={rememberMe}
+              onChange={(e) => setRememberMe(e.target.checked)}
+            />
+            remember me
           </div>
           <button onClick={handleSubmit}>log in</button>
         </>

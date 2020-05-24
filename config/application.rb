@@ -36,6 +36,7 @@ module Authie
     config.session_store :cookie_store, key: "_authie_session_#{Rails.env}"
     config.middleware.use ActionDispatch::Cookies
     config.middleware.use ActionDispatch::Session::CookieStore, key: "_authie"
+    config.middleware.use ActionDispatch::Flash
 
     config.middleware.insert_before 0, Rack::Cors, debug: true, logger: (-> { Rails.logger }) do
       allow do
