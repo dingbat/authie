@@ -4,8 +4,4 @@ class TestController < ApplicationController
   def create
     render json: { ok: "ok" }
   end
-
-  def csrf
-    render json: { csrf: masked_authenticity_token(session) }
-  end
 end

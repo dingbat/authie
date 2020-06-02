@@ -38,27 +38,6 @@ function App() {
     } catch {}
   }, []);
 
-  const handleSession = useCallback(async () => {
-    try {
-      const data = await callApi({
-        path: "/csrf",
-        method: "GET",
-      });
-      csrf = data.csrf;
-      return true;
-    } catch {
-      return false;
-    }
-  }, []);
-
-  useEffect(() => {
-    const checkLogin = async () => {
-      const loggedIn = await handleSession();
-      setAuthenticated(loggedIn);
-    };
-    checkLogin();
-  }, [handleSession]);
-
   const handleTest = useCallback(async () => {
     try {
       const data = await callApi({
@@ -71,14 +50,19 @@ function App() {
 
   const handleSubmit = useCallback(async () => {
     try {
-      await callApi({
+      const data = await callApi({
         body: { user: { email, password, remember_me: rememberMe } },
         path: "/users/sign_in",
         method: "POST",
       });
       setAuthenticated(true);
+      csrf = data.csrf_token;
     } catch {}
   }, [email, password, rememberMe]);
+
+  useEffect(() => {
+    handleSubmit();
+  }, []);
 
   return (
     <div className="App">
@@ -117,9 +101,6 @@ function App() {
       )}
       <div>
         <button onClick={handleTest}>test API</button>
-      </div>
-      <div>
-        <button onClick={handleSession}>get session</button>
       </div>
       <div>
         <button onClick={handleLogOut}>log out</button>
