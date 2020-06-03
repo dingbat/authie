@@ -23,10 +23,7 @@ class Users::PasswordsController < Devise::SessionsController
     if resource.errors.any?
       render json: { errors: resource.errors }, status: :unprocessable_entity
     else
-      if Devise.sign_in_after_reset_password
-        resource.after_database_authentication
-        sign_in(:user, resource)
-      end
+      sign_out(:user)
       render json: {}
     end
   end

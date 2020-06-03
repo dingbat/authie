@@ -24,9 +24,13 @@ async function callApi({ path, body, method }) {
 
 function App() {
   const [authenticated, setAuthenticated] = useState(false);
+
   const [email, setEmail] = useState("test@test.com");
   const [password, setPassword] = useState("password");
   const [rememberMe, setRememberMe] = useState(false);
+
+  const [newPassword, setNewPassword] = useState("");
+  const [resetPasswordToken, setResetPasswordToken] = useState("");
 
   const handleLogOut = useCallback(async () => {
     try {
@@ -64,6 +68,11 @@ function App() {
     login({ user: { email, password, remember_me: rememberMe } });
   }, [email, password, rememberMe]);
 
+  useEffect(() => {
+    login({});
+  }, []);
+
+  // reset
   const handleRequestReset = useCallback(async () => {
     try {
       const data = await callApi({
@@ -75,9 +84,22 @@ function App() {
     } catch {}
   }, [email]);
 
-  useEffect(() => {
-    login({});
-  }, []);
+  const handleUpdatePassword = useCallback(async () => {
+    try {
+      const data = await callApi({
+        body: {
+          user: {
+            password: newPassword,
+            password_confirmation: newPassword,
+            reset_password_token: resetPasswordToken,
+          },
+        },
+        path: "/users/password",
+        method: "PUT",
+      });
+      console.log(data);
+    } catch {}
+  }, [newPassword, resetPasswordToken]);
 
   return (
     <div className="App">
@@ -134,6 +156,29 @@ function App() {
       </div>
       <div>
         <button onClick={handleRequestReset}>request password reset</button>
+      </div>
+
+      <br />
+      <br />
+
+      reset password
+      <div>
+        <input
+          value={newPassword}
+          onChange={(e) => setNewPassword(e.target.value)}
+          placeholder="new password"
+          type="password"
+        />
+      </div>
+      <div>
+        <input
+          value={resetPasswordToken}
+          onChange={(e) => setResetPasswordToken(e.target.value)}
+          placeholder="reset password token"
+        />
+      </div>
+      <div>
+        <button onClick={handleUpdatePassword}>update password</button>
       </div>
     </div>
   );
