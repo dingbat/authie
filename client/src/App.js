@@ -14,7 +14,7 @@ async function callApi({ path, body, method }) {
     },
     credentials: "include",
   };
-  const data = await fetch(`http://localhost:3000/${path}`, fetchOptions);
+  const data = await fetch(`http://localhost:3000${path}`, fetchOptions);
   if (data.status >= 400) {
     throw new Error("API error");
   }
@@ -24,8 +24,8 @@ async function callApi({ path, body, method }) {
 
 function App() {
   const [authenticated, setAuthenticated] = useState(false);
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
+  const [email, setEmail] = useState("test@test.com");
+  const [password, setPassword] = useState("password");
   const [rememberMe, setRememberMe] = useState(false);
 
   const handleLogOut = useCallback(async () => {
@@ -48,20 +48,24 @@ function App() {
     } catch {}
   }, []);
 
-  const handleSubmit = useCallback(async () => {
+  const login = useCallback(async (body) => {
     try {
       const data = await callApi({
-        body: { user: { email, password, remember_me: rememberMe } },
+        body,
         path: "/users/sign_in",
         method: "POST",
       });
       setAuthenticated(true);
       csrf = data.csrf_token;
     } catch {}
+  }, []);
+
+  const handleSubmit = useCallback(() => {
+    login({ user: { email, password, remember_me: rememberMe } });
   }, [email, password, rememberMe]);
 
   useEffect(() => {
-    handleSubmit();
+    login({});
   }, []);
 
   return (
