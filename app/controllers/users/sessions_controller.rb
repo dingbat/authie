@@ -5,6 +5,7 @@ class Users::SessionsController < Devise::SessionsController
   skip_before_action :verify_signed_out_user
 
   # POST /users/sign_in
+  # { "user": { "email": "my_email", "password": "my_password", "remember_me": true } }
   def create
     self.resource = warden.authenticate!(auth_options)
     sign_in(:user, resource)

@@ -64,6 +64,17 @@ function App() {
     login({ user: { email, password, remember_me: rememberMe } });
   }, [email, password, rememberMe]);
 
+  const handleRequestReset = useCallback(async () => {
+    try {
+      const data = await callApi({
+        body: { user: { email } },
+        path: "/users/password",
+        method: "POST",
+      });
+      console.log(data);
+    } catch {}
+  }, [email]);
+
   useEffect(() => {
     login({});
   }, []);
@@ -108,6 +119,21 @@ function App() {
       </div>
       <div>
         <button onClick={handleLogOut}>log out</button>
+      </div>
+
+      <br />
+      <br />
+
+      request reset password email
+      <div>
+        <input
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+          placeholder="email"
+        />
+      </div>
+      <div>
+        <button onClick={handleRequestReset}>request password reset</button>
       </div>
     </div>
   );
