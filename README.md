@@ -12,10 +12,12 @@ devise for an API / SPA combo, there was nothing to be found online, thus:
     `config/application.rb`:
 
     ```rb
-    config.session_store :cookie_store, key: "_authie_session_#{Rails.env}"
     config.middleware.use ActionDispatch::Cookies
-    config.middleware.use ActionDispatch::Session::CookieStore, key: "_yourappname"
+    config.middleware.use ActionDispatch::Session::CookieStore, key: "_yourappname", domain: :all
     ```
+
+    NOTE: the `domain: :all` is only needed if your API lives on a different
+    subdomain than the SPA.
 
 2.  if you're using `rack-cors` (how could you not), you need to add
     `credentials: true` to your `resource` so that cookies get transmitted.
@@ -37,7 +39,7 @@ devise for an API / SPA combo, there was nothing to be found online, thus:
     protect_from_forgery with: :null_session
     ```
 
-4.  set up your custom devise routes to only allow what we need:
+4.  set up your custom devise routes to only allow what we'll need:
 
     ```rb
     devise_for :users, only: []

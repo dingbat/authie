@@ -33,10 +33,8 @@ module Authie
     # Middleware like session, flash, cookies can be added back manually.
     # Skip views, helpers and assets when generating a new resource.
     config.api_only = true
-    config.session_store :cookie_store, key: "_authie_session_#{Rails.env}"
     config.middleware.use ActionDispatch::Cookies
-    config.middleware.use ActionDispatch::Session::CookieStore, key: "_authie"
-    config.middleware.use ActionDispatch::Flash
+    config.middleware.use ActionDispatch::Session::CookieStore, key: "_authie", domain: :all
 
     config.middleware.insert_before 0, Rack::Cors, debug: true, logger: (-> { Rails.logger }) do
       allow do
