@@ -151,6 +151,26 @@ devise for an API / SPA combo, there was nothing to be found online, thus:
     <%= link_to 'Change my password', "http://myfrontend.com/reset-password?token=#{@token}" %>
     ```
 
+8.  for some reason, the `config.extend_remember_period` Devise option that's
+    supposed to fix this seems to not work with this setup (or maybe I don't
+    fully understand how it's supposed to work), so if you are looking for a way
+    to extend the remember me's expiration date to be based off the latest
+    request (as opposed to when the login occurred), add the following to your
+    application controller:
+
+    ```rb
+    include ActionController::Cookies # if api_only app
+    include Devise::Controllers::Rememberable
+
+    before_action :extend_remember_me
+
+    private
+
+    def extend_remember_me
+      remember_me(current_user) if remember_me_is_active?(current_user)
+    end
+    ```
+
 ## SPA
 
 1. when you `fetch`, make sure you include the CSRF token and credentials is set
